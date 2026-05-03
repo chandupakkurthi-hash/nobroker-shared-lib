@@ -70,7 +70,7 @@ def call(Map config) {
 
                     sh "docker image prune -f"
                     sh "docker builder prune -f"
-                    deleteDir()
+                    cleanWs()
                 }
             }
         }
