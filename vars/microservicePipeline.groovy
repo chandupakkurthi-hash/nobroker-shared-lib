@@ -11,7 +11,6 @@ def call(Map config) {
             MANIFEST_REPO = "github.com/chandupakkurthi-hash/nobroker-manifests.git"
         }
         stages {
-            stage('Checkout') { steps { checkout scm } }
             
             stage('Build & Test') {
                 steps {
@@ -46,7 +45,7 @@ def call(Map config) {
                         withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USER')]) {
                             sh """
                                 git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
-                                cd manifest-tmp/env/${envName}
+                                cd manifest-tmp/microservices/env/${envName}
                                 sed -i "s/tag: .*/tag: ${fullTag}/" ${IMG_NAME}.yaml
                                 git config user.email "jenkins@nobroker.com"
                                 git config user.name "Jenkins CI"
