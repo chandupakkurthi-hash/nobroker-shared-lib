@@ -1,4 +1,6 @@
 def call(Map config) {
+    def fullTag = ""
+
     pipeline {
         agent any
         environment {
@@ -33,6 +35,16 @@ def call(Map config) {
                         }
                     }
                 }
+            }
+        }
+        post {
+            always {
+                script {
+                    sh "docker rmi ${IMG_NAME}:${fullTag} || true"
+                    sh "docker image prune -f"
+                    sh "docker builder prune -f"
+                }
+                cleanWs()
             }
         }
     }
