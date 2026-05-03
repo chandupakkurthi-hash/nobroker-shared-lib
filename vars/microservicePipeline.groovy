@@ -62,7 +62,12 @@ def call(Map config) {
         post {
             always {
                 script {
+                    def envTag = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "production" : (env.BRANCH_NAME == 'staging' ? "staging" : "qa")
+                    def finalEcrTag = "${fullTag}-${envTag}"
+
                     sh "docker rmi ${IMG_NAME}:${fullTag} || true"
+                    sh "docker rmi ${ECR_URL}/${IMG_NAME}:${finalEcrTag} || true"
+
                     sh "docker image prune -f"
                     sh "docker builder prune -f"
                     deleteDir()
