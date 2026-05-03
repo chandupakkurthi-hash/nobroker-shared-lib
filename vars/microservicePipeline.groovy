@@ -46,11 +46,12 @@ def call(Map config) {
                             sh """
                                 git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
                                 cd manifest-tmp/microservices/env/${envName}
-                                sed -i "s/tag: .*/tag: ${fullTag}/" ${IMG_NAME}.yaml
+                                sed -i "s/tag: .*/tag: ${fullTag}-${envName}/" ${IMG_NAME}.yaml
                                 git config user.email "jenkins@nobroker.com"
                                 git config user.name "Jenkins CI"
                                 git add ${IMG_NAME}.yaml
                                 git commit -m "Deploy ${IMG_NAME} version ${fullTag} to ${envName}"
+                                git pull --rebase origin main
                                 git push origin main
                             """
                         }
