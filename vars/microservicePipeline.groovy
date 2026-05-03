@@ -43,9 +43,9 @@ def call(Map config) {
                     script {
                         def envName = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "production" : (env.BRANCH_NAME == 'staging' ? "staging" : "qa")
                         
-                        withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                        withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USER')]) {
                             sh """
-                                git clone https://${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
+                                git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
                                 cd manifest-tmp/env/${envName}
                                 sed -i "s/tag: .*/tag: ${fullTag}/" ${IMG_NAME}.yaml
                                 git config user.email "jenkins@nobroker.com"
