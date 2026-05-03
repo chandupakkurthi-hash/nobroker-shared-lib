@@ -8,6 +8,7 @@ def call(Map config) {
             AWS_ACC      = '824033491491'
             IMG_NAME     = "${config.serviceName}"
             ECR_URL      = "${AWS_ACC}.dkr.ecr.${AWS_REG}.amazonaws.com"
+            MANIFEST_REPO = "github.com/chandupakkurthi-hash/nobroker-manifests.git"
         }
         stages {
             stage('Checkout') { steps { checkout scm } }
@@ -36,6 +37,27 @@ def call(Map config) {
                     }
                 }
             }
+
+            stage('Update Manifests') {
+                steps {
+                    script {
+                        def envName = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "production" : (env.BRANCH_NAME == 'staging' ? "staging" : "qa")
+                        
+                        withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                            sh """
+                                git clone https://${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
+                                cd manifest-tmp/env/${envName}
+                                sed -i "s/tag: .*/tag: ${fullTag}/" ${IMG_NAME}.yaml
+                                git config user.email "jenkins@nobroker.com"
+                                git config user.name "Jenkins CI"
+                                git add ${IMG_NAME}.yaml
+                                git commit -m "Deploy ${IMG_NAME} version ${fullTag} to ${envName}"
+                                git push origin main
+                            """
+                        }
+                    }
+                }
+            }
         }
         post {
             always {
@@ -43,8 +65,8 @@ def call(Map config) {
                     sh "docker rmi ${IMG_NAME}:${fullTag} || true"
                     sh "docker image prune -f"
                     sh "docker builder prune -f"
+                    deleteDir()
                 }
-                cleanWs()
             }
         }
     }
