@@ -42,10 +42,11 @@ def call(Map config) {
                     script {
                         def envName = (env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master') ? "production" : (env.BRANCH_NAME == 'staging' ? "staging" : "qa")
                         
+                        def manifestDir = "manifest-${env.BUILD_NUMBER}"
                         withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USER')]) {
                             sh """
-                                git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} manifest-tmp
-                                cd manifest-tmp/microservices/env/${envName}
+                                git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@${MANIFEST_REPO} ${manifestDir}
+                                cd ${manifestDir}/microservices/env/${envName}
                                 sed -i "s/tag: .*/tag: ${fullTag}-${envName}/" ${IMG_NAME}.yaml
                                 git config user.email "jenkins@nobroker.com"
                                 git config user.name "Jenkins CI"
