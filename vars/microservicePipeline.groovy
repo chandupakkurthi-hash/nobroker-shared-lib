@@ -51,7 +51,7 @@ def call(Map config) {
                                 git config user.email "jenkins@nobroker.com"
                                 git config user.name "Jenkins CI"
                                 git add ${IMG_NAME}.yaml
-                                git commit -m "Deploy ${IMG_NAME} version ${fullTag} to ${envName}"
+                                git diff --cached --quiet || git commit -m "Deploy ${IMG_NAME} version ${fullTag} to ${envName}"
                                 git pull --rebase origin main
                                 git push origin main
                             """
