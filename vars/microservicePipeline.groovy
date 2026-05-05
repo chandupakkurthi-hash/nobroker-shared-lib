@@ -68,9 +68,6 @@ def call(Map config) {
 
                     sh "docker rmi ${IMG_NAME}:${fullTag} || true"
                     sh "docker rmi ${ECR_URL}/${IMG_NAME}:${finalEcrTag} || true"
-
-                    sh "docker image prune -f || true"
-                    sh "docker builder prune -f || true"
                     cleanWs()
                 }
             }
