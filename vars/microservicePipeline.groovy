@@ -4,8 +4,8 @@ def call(Map config) {
     pipeline {
         agent any
         environment {
-            AWS_REG      = 'eu-north-1'
-            AWS_ACC      = '824033491491'
+            AWS_REG      = 'us-east-1'
+            AWS_ACC      = '275928090866'
             IMG_NAME     = "${config.serviceName}"
             ECR_URL      = "${AWS_ACC}.dkr.ecr.${AWS_REG}.amazonaws.com"
             MANIFEST_REPO = "github.com/chandupakkurthi-hash/nobroker-manifests.git"
